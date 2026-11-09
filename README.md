@@ -5,6 +5,8 @@ A two-stage fashion recommender (candidate retrieval + learned ranking) on the
 data. Evaluated with a leak-free, time-based protocol, bootstrap confidence intervals, repeated training seeds, ablations, four rolling
 test weeks, a chronology audit and a cold-start experiment.
 
+**Live demo:** https://fashion-recsys-hm.streamlit.app/ (precomputed recommendations for a random sample of held-out customers, with product images).
+
 **Headline results (predict the next week's purchases, recall@12, 40,188 test customers):**
 
 - A LightGBM ranker over candidate generators reaches **0.0551 +/- 0.0004** (4 generators) and **0.0559 +/- 0.0004** (5 generators, mean +/- sd over
@@ -34,7 +36,7 @@ runtimes and segfault when loaded together on macOS.
 
 ## Demo
 
-`demo/` is a Streamlit app that shows the ranker's recommendations for a random sample of 60 customers from the held-out final week (their recent
+Live at https://fashion-recsys-hm.streamlit.app/ (free hosting: it may need about 30 seconds to wake up). `demo/` is a Streamlit app that shows the ranker's recommendations for a random sample of 60 customers from the held-out final week (their recent
 purchases, the 12 recommended articles with the generator that proposed each, and what they actually bought), plus the results tables.
 It runs on **precomputed** output, not live inference: the full pipeline needs several GB of transactions and minutes of compute. In the sample, most
 customers have no correct recommendation, which matches the roughly 5% recall@12 reported below.
