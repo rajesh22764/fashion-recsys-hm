@@ -1,0 +1,11 @@
+# data and caches are large and downloaded separately (see README)
+data/*
+!data/.gitkeep
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
+*.npy
+*.pkl
+*.pt
