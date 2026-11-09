@@ -49,6 +49,17 @@ python scripts/build_demo.py data/hm      # rebuild the sample (needs the cached
 
 Product images are small thumbnails of the H&M dataset images (H&M Personalized Fashion Recommendations on Kaggle).
 
+## Guided notebook
+
+`notebooks/project_walkthrough.ipynb` walks through the whole project cell by cell: the data, the time-based split and the leak I fixed, the metrics from scratch, the baselines,
+candidate generation, the features, the ranker with confidence intervals, a look at real recommendations, the candidate-pool analysis, the two-tower model and cold start, and seed noise.
+Each section explains what and why, runs the real code from `src/`, and says how to read the output. With the default settings (a sample of customers) it runs in about 6 to 8 minutes;
+the saved outputs are from that run. It must not import `torch` (see the note on OpenMP above), so the two-tower and cold-start steps are read there and run as separate processes.
+
+```bash
+jupyter notebook notebooks/project_walkthrough.ipynb
+```
+
 ## Data and protocol
 
 - Last 26 weeks of transactions; repeat purchases of the same article by the same customer are collapsed to the first.
@@ -278,5 +289,5 @@ src/audit.py       chronology audit                               src/analyze.py
 src/two_by_two.py  two-tower candidate vs feature                  src/multisnap.py   multi-week ranker training
 src/retrieval_analysis.py   generator contributions and candidate-budget curve
 src/seed_variance.py, src/rolling_seeds.py   noise floor and seeded rolling weeks
-src/add_tt_feature.py   scripts/run_pipeline.sh   scripts/build_demo.py   demo/ (Streamlit app)   tests/
+src/add_tt_feature.py   scripts/run_pipeline.sh   scripts/build_demo.py   demo/ (Streamlit app)   notebooks/ (guided walkthrough)   tests/
 ```
