@@ -9,3 +9,4 @@ __pycache__/
 *.npy
 *.pkl
 *.pt
+demo/_download_tmp/

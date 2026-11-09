@@ -32,6 +32,21 @@ pytest
 Candidate building (uses torch) and ranker training (LightGBM) run as separate processes on purpose: the two libraries bundle different OpenMP
 runtimes and segfault when loaded together on macOS.
 
+## Demo
+
+`demo/` is a Streamlit app that shows the ranker's recommendations for a random sample of 60 customers from the held-out final week (their recent
+purchases, the 12 recommended articles with the generator that proposed each, and what they actually bought), plus the results tables.
+It runs on **precomputed** output, not live inference: the full pipeline needs several GB of transactions and minutes of compute. In the sample, most
+customers have no correct recommendation, which matches the roughly 5% recall@12 reported below.
+
+```bash
+pip install -r demo/requirements.txt
+streamlit run demo/app.py
+python scripts/build_demo.py data/hm      # rebuild the sample (needs the cached candidate tables and Kaggle credentials)
+```
+
+Product images are small thumbnails of the H&M dataset images (H&M Personalized Fashion Recommendations on Kaggle).
+
 ## Data and protocol
 
 - Last 26 weeks of transactions; repeat purchases of the same article by the same customer are collapsed to the first.
@@ -261,5 +276,5 @@ src/audit.py       chronology audit                               src/analyze.py
 src/two_by_two.py  two-tower candidate vs feature                  src/multisnap.py   multi-week ranker training
 src/retrieval_analysis.py   generator contributions and candidate-budget curve
 src/seed_variance.py, src/rolling_seeds.py   noise floor and seeded rolling weeks
-src/add_tt_feature.py   scripts/run_pipeline.sh   tests/
+src/add_tt_feature.py   scripts/run_pipeline.sh   scripts/build_demo.py   demo/ (Streamlit app)   tests/
 ```
