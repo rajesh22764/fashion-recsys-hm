@@ -41,6 +41,7 @@ class Split:
     n_users: int
     n_items: int
     item_ids: np.ndarray  # item_ids[i] is the original id of the item coded i
+    user_ids: np.ndarray | None = None  # user_ids[u] is the original id of the customer coded u
 
 
 def _index(df: pd.DataFrame):
@@ -49,11 +50,12 @@ def _index(df: pd.DataFrame):
     df["u"] = df["user_id"].astype("category").cat.codes
     item_cat = df["item_id"].astype("category")
     df["i"] = item_cat.cat.codes
-    return df, item_cat.cat.categories.to_numpy()
+    user_cat = df["user_id"].astype("category")   # same categories that produced the "u" codes above
+    return df, item_cat.cat.categories.to_numpy(), user_cat.cat.categories.to_numpy()
 
 
-def _make_split(df: pd.DataFrame, item_ids: np.ndarray, t1: int, t2: int) -> Split:
-    return Split(df.iloc[:t1], df.iloc[t1:t2], df.iloc[t2:], df["u"].nunique(), len(item_ids), item_ids)
+def _make_split(df: pd.DataFrame, item_ids: np.ndarray, user_ids: np.ndarray, t1: int, t2: int) -> Split:
+    return Split(df.iloc[:t1], df.iloc[t1:t2], df.iloc[t2:], df["u"].nunique(), len(item_ids), item_ids, user_ids)
 
 
 def time_split(df: pd.DataFrame, val_frac: float = 0.1, test_frac: float = 0.1) -> Split:
@@ -63,9 +65,9 @@ def time_split(df: pd.DataFrame, val_frac: float = 0.1, test_frac: float = 0.1) 
     Validation/test rows for items never seen in train are kept (use
     `warm_only` when scoring models that cannot rank unseen items).
     """
-    df, item_ids = _index(df)
+    df, item_ids, user_ids = _index(df)
     n = len(df)
-    return _make_split(df, item_ids, int(n * (1 - val_frac - test_frac)), int(n * (1 - test_frac)))
+    return _make_split(df, item_ids, user_ids, int(n * (1 - val_frac - test_frac)), int(n * (1 - test_frac)))
 
 
 def last_days_split(df: pd.DataFrame, val_days: int = 7, test_days: int = 7, end: int | None = None) -> Split:
@@ -74,12 +76,12 @@ def last_days_split(df: pd.DataFrame, val_days: int = 7, test_days: int = 7, end
     Matches the Kaggle H&M protocol (predict the next week of purchases).
     `end` overrides the last timestamp (used when rows were filtered after the calendar was fixed).
     """
-    df, item_ids = _index(df)
+    df, item_ids, user_ids = _index(df)
     day = 24 * 3600 * 1000
     end = df["timestamp"].max() if end is None else end
     t2 = int(df["timestamp"].searchsorted(end - test_days * day, side="right"))
     t1 = int(df["timestamp"].searchsorted(end - (test_days + val_days) * day, side="right"))
-    return _make_split(df, item_ids, t1, t2)
+    return _make_split(df, item_ids, user_ids, t1, t2)
 
 
 def warm_only(eval_df: pd.DataFrame, train: pd.DataFrame) -> pd.DataFrame:
